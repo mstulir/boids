@@ -1,0 +1,243 @@
+
+when we get input code, we need to generate the initial sky in the main file, then once we generate that, we need to run SimualteBoids also within main
+
+
+Generate the initial board first
+func GenerateInitialSky(skyWidth int, initialSpeed float64, numBoids int, maxBoidSpeed float64, proximity float64, separationFactor, alignmentFactor,cohesionFactor float64) Sky {
+  //make a sky object and set the inputs which we dont have to change
+  width
+  maxBoidSpeed
+  proximity
+  separationFactor
+  alignmentFactor
+  cohesionFactor
+
+  //now, based on the number of boids we need to generate numBoids in a loop placing them in random positions with random directions but the given initial speed
+  //do they need an initial acceleration?? i know we need to set their position, but how do we indicate the direction??? it must be through the acceleration factor
+  // if we generate a random acceleration factor, we can generate the velocity coordinates using the given speed as a single value into x and y coordinates
+
+  //initialize boids for the sky
+  boids=[]Boid of length numBoids
+  for i in range numBoids{
+    boids[i]=GenerateBoid(initialSpeed,skyWidth)
+  }
+  return Sky
+}
+
+
+//GenerateBoid initializes a single boid within the area of the skyWidth with a random position and a random direction using the speed given for every input boid (uniform)
+func GenerateBoid(initialSpeed float64, skyWidth int) Boid {
+  //define a new boid
+  b=Boid
+
+  //assign its features
+  b.acceleration.x=0
+  b.acceleration.y=0
+  //generate position on board that is within the width of the board as a float
+  b.position.x=rand.Float64()*skyWidth
+  b.position.y=rand.Float64()*skyWidth
+
+  //generate velocity vectors that add up to the initial speed to give the boid a direction
+  b.velocity.x=rand.Flaot64()*initialSpeed
+  b.velocity.y=math.Sqrt(initialSpeed*initialSpeed -b.velocity.x*b.velocity.x)
+
+  //all of the boids parameters have been assigned to the initial value
+  return b
+
+}
+
+func SimulateBoids(initialSky Sky, numGens int, timeStep float64) []Sky {
+  //generate a slice of skies of length numGens+1
+  skies=[]Sky
+
+  //set first sky to the initial sky
+  skies[0]=initialSky
+
+  //loop through numGens+1 and call update sky
+  for i=range from 1 to numGens+1{
+    skies[i]=UpdateSky(skies[i-1], timeStep)
+  }
+  return skies
+}
+
+func UpdateSky(sky Sky, time) Sky {
+  //create a deep copy of the sky input to edit on and return
+  newSky=CopySky(sky)
+
+
+  //loop through the bodies in the sky and call update boid
+  for i in range boids in sky{
+    newSky.boid[i]=UpdateBoid(sky,sky.boid[i], time)
+  }
+  return newSky
+}
+
+//Create a deep copy of every item in the current sky
+func CopySky() {
+  //use phillips jupiter function as reference
+}
+
+func UpdateBoid(sky Sky, b Boid, time) Boid {
+
+//create vectors for each function to add to .. ordered pairs which i have not indicated properly here how to define
+forceFromSep=0
+forceFromAlign=0
+forceFromCoh=0
+//n is the number of boids within the threshold distance. if a boid within distance, this will be incremented
+n=0
+//call update functions for forces from 3 factors
+//this should be made into a subroutine
+  for i in range all boids not b {
+    distance:=calcDistance(b.position, otherboid.position)
+    if distance<sky.proximity{
+      n+=1
+      //will this addition add componentwise properly???
+      forceFromSep+=UpdateSeparation(b,otherboid, sky.separationFactor,distance, sky.proximity)
+      forceFromAlign+=UpdateAlignment(b,otherboid, sky.alignmentFactor,distance,sky,proximity)
+      forceFromCoh+=UpdateCohesion(b,otherboid, sky.cohesionFactor,distance,sky.proxmity)
+    }
+  }
+  if n>0{
+    //forces need to also be divided componentwise
+    forceFromSep=forceFromSep/n
+    forceFromAlign=forceFromAlign/n
+    forceFromCoh=forceFromCoh/n
+  } else { //this step should not be necessary, the vectors should be zero
+    forceFromSep.x=0
+    forceFromSep.y=0
+    forceFromAlign.x=0
+    forceFromAlign.y=0
+    forceFromCoh.x=0
+    forceFromCoh.y=0
+  }
+
+//sum all the forces and the current acceleration of the boid
+// I dont know for sure that the best way is to include acceleration previously at this point ...
+//force equals accleration due to unit mass (1 and F=ma)
+b.acceleration:=SumForces(forceFromSep,forceFromAccel,forceFromCoh,b.acceleration)
+
+b.velocity:=UpdateVelocity(b, time)
+
+*********
+//we are a bit stuck here, we use forces to convert a new acceleration,
+//then we use that to determine the new speed, but if the speed is above the max,
+//we need to reduce the speed of the boid. Do we need to go back and reduce the acceleration as well???????
+//I think we leave acceleration as is, but we can ask about this...
+
+//compute the speed and if it is above max speed, we need a function to fix it to the max speed, but in the same direction as the current bird
+//define speed as an ordered pair
+speed:=ComputeSpeed(b.velocity)
+
+if speed>maxBoidSpeed:
+  b.velocity:=convertSpeedToMax(sky.maxBoidSpeed, speed, b.velocity)
+
+//update position vectors
+b.position=UpdatePosition(b,time,sky.width)
+
+return b
+}
+
+//distance calculates the distance between 2 boids
+func calcDistance(p1, p2 OrderedPair) float64 {
+	// this is the distance formula from days of precalculus long ago ...
+	deltaX := p1.x - p2.x
+	deltaY := p1.y - p2.y
+	return math.Sqrt(deltaX*deltaX + deltaY*deltaY)
+}
+
+func UpdateSeparation(b,otherboid, sky.separationFactor,distance,thresholddistance) {
+  //is the distance between these 2 less than the threshold
+
+  if yes, calculate the force from separation
+
+  if not, return 0
+}
+
+func UpdateAlignment(b,otherboid, sky.alignmentFactor,distance,thresholddistance) {
+//is the distance between these 2 less than the threshold
+
+if yes, calculate the force from alignment
+
+if not, return 0
+
+}
+
+func UpdateCohesion(b,otherboid, sky.cohesionFactor,distance,thresholddistance) {
+//is the distance between these 2 less than the threshold
+
+if yes, calculate the force from cohesion
+
+if not, return 0
+
+}
+
+//sum forces should work for variable input similar to other functions that have been written in class before
+func SumForces() {
+
+}
+
+func ComputeSpeed(b Boid) float64 {
+  speed=math.Sqrt(b.velocity.x*b.velocity.x+b.velocity.y*b.velocity.y)
+  return speed
+}
+
+//could read in either whole boid or just the velocity vectors to this function
+func convertSpeedToMax(maxboidspeed float, currentSpeed float, b.velocity orderedpair) OrderedPair{
+  //define a new ordered pair vel
+  scaleFactor:=maxBoidSpeed/currentSpeed
+  vel.x=scaleFactor*b.velocity.x
+  vel.y=scaleFactor*b.velocity.y
+
+  return vel
+}
+
+
+func UpdateVelocity(b Boid,time float64) OrderedPair {
+	var vel OrderedPair
+	//new velocity is current velocity + new acceleration *time
+	vel.x=b.velocity.x + b.acceleration.x*time
+	vel.y=b.velocity.y + b.acceleration.y*time
+
+	return vel
+}
+//UpdatePosition
+//Input: a body and a timestep float64
+//Output: the orderedpair corresponding to the updated position of the body after a single time step using the bodies current acceleration and velocity
+func UpdatePosition(b Boid, time, sky.width float64) OrderedPair {
+	var pos OrderedPair
+  //uses new velocity and acceleration to update the old not updated position (we use the old position in this calculation)
+	pos.x=0.5*b.acceleration.x*time*time +b.velocity.x*time +b.position.x
+	pos.y=0.5*b.acceleration.y*time*time +b.velocity.y*time +b.position.y
+
+	//need to account for if we are off the edge of the sky. if we are we need to loop back to other side. need to add in sky.width as an input
+  pos.x=CheckPosX(pos.x,sky.width)
+  pos.y=CheckPosY(pos.y,sky.width)
+
+  return pos
+}
+
+//CheckPosX determines if the boid position is off the sky in the x direction, and loops it back onto the sky on the other side if so
+func CheckPosX(x, width float64) float64 {
+if x<0{
+  x=width+x
+} else if x>width {
+  x=x-width
+}
+return x
+}
+
+//CheckPosY determines if the boid position is off the sky in the y direction, and loops it back onto the sky on the other side if so
+func CheckPosY(y, width float64) float64 {
+  if y<0{
+  y=width+y
+  } else if y>width {
+  y=y-width
+  }
+  return y
+}
+
+
+
+
+testing code needs to be written and added.
+I'm also not confident that my code is working properly at this moment
